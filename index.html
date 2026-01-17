@@ -5,6 +5,7 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Emlak İlanı Oluşturucu</title>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/html2canvas/1.4.1/html2canvas.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
     <style>
         * {
             margin: 0;
@@ -138,12 +139,16 @@
 
         .preview-card {
             background: white;
-            border: 4px solid #e74c3c;
+            border: 5px solid #e74c3c;
+            padding: 30px;
+            margin: 30px auto;
+            max-width: 900px;
+            aspect-ratio: 1754 / 1240;
             border-radius: 10px;
-            padding: 20px;
-            max-width: 800px;
-            margin: 0 auto;
-            position: relative;
+            display: flex;
+            flex-direction: column;
+            justify-content: flex-start;
+            box-sizing: border-box;
         }
 
         .preview-card.kiralik {
@@ -172,7 +177,7 @@
         .property-details {
             display: flex;
             flex-direction: column;
-            gap: 8px;
+            gap: 12px;
         }
 
         .detail-row {
@@ -180,6 +185,7 @@
             border-radius: 5px;
             overflow: hidden;
             border: 3px solid #e74c3c;
+            min-height: 70px;
         }
 
         .detail-row.kiralik {
@@ -191,8 +197,10 @@
             color: white;
             padding: 15px 20px;
             font-weight: bold;
-            font-size: 18px;
-            min-width: 120px;
+            font-size: 24px;
+            min-width: 160px;
+            width: 160px;
+            flex-shrink: 0;
             display: flex;
             align-items: center;
             justify-content: center;
@@ -205,12 +213,14 @@
         .detail-value {
             background: white;
             padding: 15px 20px;
-            font-size: 18px;
+            font-size: 24px;
             font-weight: bold;
             color: #333;
             flex: 1;
             display: flex;
             align-items: center;
+            word-wrap: break-word;
+            overflow-wrap: break-word;
         }
 
         .buttons {
@@ -250,44 +260,430 @@
         }
 
         @media (max-width: 768px) {
-            .form-grid {
-                grid-template-columns: 1fr;
-                gap: 15px;
+            body {
+                padding: 10px;
             }
-            
-            .type-buttons {
-                flex-direction: column;
-                align-items: center;
+
+            .container {
+                border-radius: 5px;
             }
-            
-            .type-btn {
-                width: 200px;
-                margin-bottom: 10px;
+
+            .header h1 {
+                font-size: 1.8em;
+                margin-bottom: 5px;
             }
-            
-            .preview-card {
-                margin: 0 10px;
+
+            .header p {
+                font-size: 12px;
+            }
+
+            .form-section {
                 padding: 15px;
             }
-            
-            .title {
-                font-size: 2em;
+
+            .form-grid {
+                grid-template-columns: 1fr;
+                gap: 10px;
+                margin-bottom: 15px;
             }
-            
-            .detail-label, .detail-value {
-                padding: 12px 15px;
+
+            .form-group label {
+                font-size: 14px;
+                padding: 8px 10px;
+            }
+
+            .form-group input {
+                padding: 12px;
+                font-size: 14px;
+            }
+
+            /* Yazı Boyutu Ayarı - Mobile */
+            .form-group[style*="grid-column"] {
+                margin-top: 15px !important;
+            }
+
+            .form-group[style*="grid-column"] div {
+                flex-direction: column;
+                gap: 10px !important;
+            }
+
+            .form-group[style*="grid-column"] span {
+                width: 100% !important;
+                min-width: auto !important;
+                text-align: center !important;
+            }
+
+            .form-group[style*="grid-column"] input[type="range"] {
+                width: 100% !important;
+            }
+
+            .type-buttons {
+                flex-direction: column;
+                align-items: stretch;
+                gap: 8px;
+            }
+
+            .type-btn {
+                width: 100%;
+                padding: 12px 20px;
+                margin: 0;
                 font-size: 16px;
             }
-            
-            .btn {
-                display: block;
-                width: 100%;
-                margin: 10px 0;
+
+            .preview-card {
+                margin: 15px auto;
+                padding: 20px;
+                border: 4px solid;
+                border-radius: 8px;
+                max-width: 95%;
+                aspect-ratio: 1754 / 1240;
             }
+
+            .preview-header {
+                margin-bottom: 15px;
+            }
+
+            .title {
+                font-size: 2em;
+                letter-spacing: 1px;
+                font-weight: bold;
+            }
+
+            .property-details {
+                gap: 10px;
+            }
+
+            .detail-row {
+                flex-wrap: wrap;
+                min-height: 60px;
+                border: 3px solid;
+                border-radius: 5px;
+                overflow: hidden;
+            }
+
+            .detail-label {
+                background: #e74c3c;
+                color: white;
+                font-size: 16px;
+                padding: 12px 15px;
+                font-weight: bold;
+                width: 120px;
+                min-width: 120px;
+                flex-shrink: 0;
+                display: flex;
+                align-items: center;
+                justify-content: center;
+                margin-bottom: 0;
+                border-radius: 0;
+            }
+
+            .detail-label.kiralik {
+                background: #3498db;
+            }
+
+            .detail-value {
+                background: white;
+                color: #333;
+                font-size: 16px;
+                padding: 12px 15px;
+                flex: 1;
+                display: flex;
+                align-items: center;
+                border-radius: 0;
+            }
+
+            .buttons {
+                display: flex;
+                flex-direction: column;
+                gap: 10px;
+                margin-top: 20px;
+            }
+
+            .btn {
+                padding: 14px 15px;
+                font-size: 15px;
+                margin: 0;
+                width: 100%;
+                border-radius: 5px;
+                cursor: pointer;
+                transition: background 0.3s;
+            }
+
+            .detail-row {
+                flex-wrap: wrap;
+                min-height: 60px;
+                border: 3px solid;
+                border-radius: 5px;
+                overflow: hidden;
+            }
+
+            .preview-section {
+                padding: 10px;
+                margin-top: 15px;
+            }
+
+            .preview-section h3 {
+                font-size: 16px;
+                margin-bottom: 15px;
+            }
+
+            #preview-firma {
+                font-size: 24px !important;
+                margin-bottom: 15px;
+            }
+
+            /* Modal Mobile */
+            .modal-content {
+                width: 95%;
+                padding: 20px;
+                max-height: 90vh;
+            }
+
+            .modal-header h2 {
+                font-size: 20px;
+            }
+
+            .instruction-step {
+                margin-bottom: 15px;
+                padding: 12px;
+            }
+
+            .instruction-step h3 {
+                font-size: 16px;
+            }
+
+            .instruction-step p {
+                font-size: 14px;
+                line-height: 1.6;
+            }
+
+            .help-button {
+                width: 50px;
+                height: 50px;
+                bottom: 20px;
+                right: 20px;
+                font-size: 24px;
+            }
+        }
+
+        @media (max-width: 480px) {
+            body {
+                padding: 5px;
+            }
+
+            .header h1 {
+                font-size: 1.4em;
+            }
+
+            .type-btn {
+                font-size: 14px;
+                padding: 10px;
+            }
+
+            .preview-card {
+                margin: 15px auto;
+                padding: 18px;
+                max-width: 98%;
+                aspect-ratio: 1754 / 1240;
+            }
+
+            .detail-label {
+                font-size: 15px;
+                width: 110px;
+                min-width: 110px;
+            }
+
+            .detail-value {
+                font-size: 15px;
+            }
+
+            .btn {
+                font-size: 14px;
+                padding: 12px;
+            }
+
+            .modal-content {
+                width: 98%;
+                padding: 15px;
+            }
+
+            .help-button {
+                width: 45px;
+                height: 45px;
+                font-size: 20px;
+            }
+        }
+
+        /* Modal/Pop-up Styles */
+        .modal {
+            display: none;
+            position: fixed;
+            z-index: 9999;
+            left: 0;
+            top: 0;
+            width: 100%;
+            height: 100%;
+            background-color: rgba(0, 0, 0, 0.6);
+        }
+
+        .modal.show {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+
+        .modal-content {
+            background-color: white;
+            padding: 30px;
+            border-radius: 15px;
+            max-width: 600px;
+            width: 90%;
+            max-height: 80vh;
+            overflow-y: auto;
+            box-shadow: 0 4px 20px rgba(0, 0, 0, 0.3);
+        }
+
+        .modal-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 20px;
+            padding-bottom: 15px;
+            border-bottom: 3px solid #e74c3c;
+        }
+
+        .modal-header h2 {
+            color: #e74c3c;
+            font-size: 28px;
+            margin: 0;
+        }
+
+        .modal-close {
+            background: none;
+            border: none;
+            font-size: 32px;
+            cursor: pointer;
+            color: #e74c3c;
+            font-weight: bold;
+        }
+
+        .modal-close:hover {
+            color: #c0392b;
+        }
+
+        .modal-body {
+            color: #333;
+            line-height: 1.8;
+        }
+
+        .instruction-step {
+            margin-bottom: 25px;
+            padding: 15px;
+            background: #f8f9fa;
+            border-left: 4px solid #e74c3c;
+            border-radius: 5px;
+        }
+
+        .instruction-step h3 {
+            color: #e74c3c;
+            margin: 0 0 10px 0;
+            font-size: 18px;
+        }
+
+        .instruction-step p {
+            margin: 0;
+            font-size: 16px;
+        }
+
+        .help-button {
+            position: fixed;
+            bottom: 30px;
+            right: 30px;
+            background: #e74c3c;
+            color: white;
+            border: none;
+            width: 60px;
+            height: 60px;
+            border-radius: 50%;
+            font-size: 28px;
+            cursor: pointer;
+            box-shadow: 0 4px 15px rgba(0, 0, 0, 0.2);
+            z-index: 1000;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            transition: all 0.3s;
+        }
+
+        .help-button:hover {
+            background: #c0392b;
+            transform: scale(1.1);
+            box-shadow: 0 6px 20px rgba(0, 0, 0, 0.3);
         }
     </style>
 </head>
 <body>
+    <!-- Yardım Modal -->
+    <div id="helpModal" class="modal">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h2>📖 Nasıl Kullanırılır?</h2>
+                <button class="modal-close" onclick="closeHelp()">&times;</button>
+            </div>
+            <div class="modal-body">
+                <div class="instruction-step">
+                    <h3>1️⃣ Satış/Kiralık Seçin</h3>
+                    <p>Sayfanın başında <strong>SATILIK</strong> ya da <strong>KİRALIK</strong> butonuna tıklayın. Renk değiştiğinde seçim yapılmış demektir.</p>
+                </div>
+
+                <div class="instruction-step">
+                    <h3>2️⃣ Firma Adı Girin (İsteğe Bağlı)</h3>
+                    <p>Emlakçı firmanızın adını yazın. Varsayılan olarak <strong>"ENSARİOĞLU GAYRİMENKUL"</strong> yazılıdır. Değiştirmek istemezseniz olduğu gibi bırakabilirsiniz.</p>
+                </div>
+
+                <div class="instruction-step">
+                    <h3>3️⃣ Emlak Bilgilerini Doldurun</h3>
+                    <p>Aşağıdaki alanları doldurun:</p>
+                    <p><strong>• CİNS:</strong> "3+1 DAİRE (115 M²)" gibi yazın<br>
+                    <strong>• KONUM:</strong> Bulunduğu mahalle/bölge yazın<br>
+                    <strong>• ÖZELLİK:</strong> "ESKİ YAPI, 2. KAT" gibi özellikler yazın<br>
+                    <strong>• FİYAT:</strong> "2 MİLYON 400 BİN TL" şeklinde yazın</p>
+                </div>
+
+                <div class="instruction-step">
+                    <h3>4️⃣ Yazı Boyutunu Ayarlayın</h3>
+                    <p><strong>YAZI BOYUTU AYARI</strong> başlığının altındaki kaydırıcıyı sağa-sola kaydırarak metinlerin büyüklüğünü kontrol edin. <strong>Sağ tarafta mevcut boyut gösterilir.</strong></p>
+                </div>
+
+                <div class="instruction-step">
+                    <h3>5️⃣ Önizlemede Kontrol Edin</h3>
+                    <p>Sayfayı aşağı kaydırarak <strong>"Önizleme (Gerçek Çıktı)"</strong> bölümünde ilanınızın nasıl görüneceğini görebilirsiniz. <strong>Tam olarak bu şekilde çıkacaktır.</strong></p>
+                </div>
+
+                <div class="instruction-step">
+                    <h3>6️⃣ Resim İndir</h3>
+                    <p><strong>Kırmızı "Resim İndir"</strong> butonuna tıklayın. A4 boyutunda, çıktı almaya hazır bir PNG resmi bilgisayarınıza indirilecektir.</p>
+                </div>
+
+                <div class="instruction-step">
+                    <h3>7️⃣ PDF İndir</h3>
+                    <p><strong>Yeşil "PDF İndir"</strong> butonuna tıklayın. İlanınız PDF formatında indirilecektir. Yazıcıdan A4 kağıda yazdırabilirsiniz.</p>
+                </div>
+
+                <div class="instruction-step">
+                    <h3>💡 İpuçları</h3>
+                    <p>• Yazı boyutunu küçük tutarsanız daha fazla bilgi sığabilir<br>
+                    • Dosya adı otomatik olarak <strong>"cins_konum"</strong> formatında oluşturulur<br>
+                    • Temizle butonuyla tüm alanları sıfırlayabilirsiniz<br>
+                    • Yazılar otomatik olarak BÜYÜK HARF'e çevrilir</p>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Yardım Butonu -->
+    <button class="help-button" onclick="openHelp()" title="Nasıl Kullanırılır?">?</button>
+
     <div class="container">
         <div class="header">
             <h1>Emlak İlanı Oluşturucu</h1>
@@ -303,6 +699,10 @@
             </div>
             
             <div class="form-grid">
+                <div class="form-group">
+                    <label for="firma" id="label-firma">FİRMA ADI</label>
+                    <input type="text" id="firma" placeholder="Örn: ENSARİOĞLU GAYRİMENKUL" value="ENSARİOĞLU GAYRİMENKUL">
+                </div>
                 <div class="form-group">
                     <label for="cins" id="label-cins">CİNS</label>
                     <input type="text" id="cins" placeholder="Örn: 3+1 DAİRE (115 M²)">
@@ -321,15 +721,32 @@
                 </div>
             </div>
 
+            <div class="form-group" style="grid-column: 1 / -1; margin-top: 20px;">
+                <label style="background: #2c3e50;">YAZI BOYUTU AYARI</label>
+                <div style="display: flex; gap: 20px; align-items: center; padding: 15px; border: 3px solid #2c3e50; border-top: none; border-radius: 0 0 5px 5px; background: white;">
+                    <span style="font-weight: bold; min-width: 100px;">Küçük</span>
+                    <input type="range" id="fontSize" min="18" max="36" value="28" step="2" style="flex: 1;" oninput="updateFontSize(this.value)">
+                    <span style="font-weight: bold; min-width: 100px; text-align: right;">Büyük</span>
+                    <span id="fontSizeValue" style="font-weight: bold; min-width: 60px; text-align: center; background: #2c3e50; color: white; padding: 5px 10px; border-radius: 5px;">28px</span>
+                </div>
+            </div>
+
             <div class="buttons">
                 <button class="btn" onclick="updatePreview()">Önizlemeyi Güncelle</button>
                 <button class="btn btn-secondary" onclick="clearForm()">Temizle</button>
                 <button class="btn" onclick="downloadAsImage()">Resim İndir</button>
+                <button class="btn" style="background: #27ae60;" onclick="downloadAsPDF()">PDF İndir</button>
             </div>
         </div>
 
         <div class="preview-section">
-            <h3 style="text-align: center; margin-bottom: 20px; color: #e74c3c;" id="preview-title">Önizleme</h3>
+            <h3 style="text-align: center; margin-bottom: 20px; color: #e74c3c;" id="preview-title">Önizleme (Gerçek Çıktı)</h3>
+            
+            <!-- Firma adı önizleme için -->
+            <div style="text-align: center; margin-bottom: 20px;">
+                <div id="preview-firma" style="font-size: 48px; font-weight: bold; color: #e74c3c; font-family: Arial, sans-serif;">ENSARİOĞLU GAYRİMENKUL</div>
+            </div>
+            
             <div class="preview-card" id="preview-card">
                 <div class="preview-header">
                     <div class="title" id="title-text">SATILIK</div>
@@ -361,6 +778,47 @@
 
     <script>
         let currentType = 'satilik';
+        let currentFontSize = 28;
+
+        function openHelp() {
+            document.getElementById('helpModal').classList.add('show');
+        }
+
+        function closeHelp() {
+            document.getElementById('helpModal').classList.remove('show');
+        }
+
+        // Modal'ın dışına tıklanırsa kapat
+        window.onclick = function(event) {
+            const modal = document.getElementById('helpModal');
+            if (event.target === modal) {
+                closeHelp();
+            }
+        }
+
+        // ESC tuşuna basınca kapat
+        document.addEventListener('keydown', function(event) {
+            if (event.key === 'Escape') {
+                closeHelp();
+            }
+        });
+
+        function updateFontSize(size) {
+            currentFontSize = parseInt(size);
+            document.getElementById('fontSizeValue').textContent = size + 'px';
+            
+            // Önizlemedeki yazı boyutlarını güncelle
+            const detailLabels = document.querySelectorAll('#preview-card .detail-label');
+            const detailValues = document.querySelectorAll('#preview-card .detail-value');
+            
+            detailLabels.forEach(label => {
+                label.style.fontSize = size + 'px';
+            });
+            
+            detailValues.forEach(value => {
+                value.style.fontSize = size + 'px';
+            });
+        }
 
         function setType(type) {
             currentType = type;
@@ -387,6 +845,7 @@
             const previewCard = document.getElementById('preview-card');
             const titleText = document.getElementById('title-text');
             const previewTitle = document.getElementById('preview-title');
+            const previewFirma = document.getElementById('preview-firma');
             const detailLabels = document.querySelectorAll('.detail-label');
             const detailValues = document.querySelectorAll('.detail-value');
             const detailRows = document.querySelectorAll('.detail-row');
@@ -396,6 +855,7 @@
                 titleText.classList.add('kiralik');
                 titleText.textContent = 'KİRALIK';
                 previewTitle.style.color = '#3498db';
+                previewFirma.style.color = '#3498db';
                 detailLabels.forEach(label => label.classList.add('kiralik'));
                 detailValues.forEach(value => value.classList.add('kiralik'));
                 detailRows.forEach(row => row.classList.add('kiralik'));
@@ -404,6 +864,7 @@
                 titleText.classList.remove('kiralik');
                 titleText.textContent = 'SATILIK';
                 previewTitle.style.color = '#e74c3c';
+                previewFirma.style.color = '#e74c3c';
                 detailLabels.forEach(label => label.classList.remove('kiralik'));
                 detailValues.forEach(value => value.classList.remove('kiralik'));
                 detailRows.forEach(row => row.classList.remove('kiralik'));
@@ -411,18 +872,24 @@
         }
 
         function updatePreview() {
+            const firma = document.getElementById('firma').value || 'ENSARİOĞLU GAYRİMENKUL';
             const cins = document.getElementById('cins').value || '3+1 DAİRE (115 M²)';
             const konum = document.getElementById('konum').value || 'MEHMET AKİF MAH.';
             const ozellik = document.getElementById('ozellik').value || 'ESKİ YAPI, 2. KAT, 60 M² ARSA PAYI';
             const fiyat = document.getElementById('fiyat').value || '2 MİLYON 400 BİN TL';
 
+            document.getElementById('preview-firma').textContent = firma.toUpperCase();
             document.getElementById('preview-cins').textContent = cins.toUpperCase();
             document.getElementById('preview-konum').textContent = konum.toUpperCase();
             document.getElementById('preview-ozellik').textContent = ozellik.toUpperCase();
             document.getElementById('preview-fiyat').textContent = fiyat.toUpperCase();
+            
+            // Font boyutunu uygula
+            updateFontSize(currentFontSize);
         }
 
         function clearForm() {
+            document.getElementById('firma').value = 'ENSARİOĞLU GAYRİMENKUL';
             document.getElementById('cins').value = '';
             document.getElementById('konum').value = '';
             document.getElementById('ozellik').value = '';
@@ -434,18 +901,19 @@
             updatePreview();
             
             const previewCard = document.getElementById('preview-card');
+            const firma = document.getElementById('firma').value || 'ENSARİOĞLU GAYRİMENKUL';
             
             // Önce preview card'ı sabit boyutta klonla
             const clonedCard = previewCard.cloneNode(true);
             clonedCard.style.position = 'absolute';
             clonedCard.style.left = '-9999px';
             clonedCard.style.top = '0';
-            clonedCard.style.width = '600px'; // Sabit genişlik
-            clonedCard.style.maxWidth = '600px';
-            clonedCard.style.padding = '20px';
-            clonedCard.style.fontSize = '16px';
-            clonedCard.style.border = currentType === 'kiralik' ? '4px solid #3498db' : '4px solid #e74c3c';
-            clonedCard.style.borderRadius = '10px';
+            clonedCard.style.width = '800px';
+            clonedCard.style.maxWidth = '800px';
+            clonedCard.style.padding = '30px';
+            clonedCard.style.fontSize = '22px';
+            clonedCard.style.border = currentType === 'kiralik' ? '6px solid #3498db' : '6px solid #e74c3c';
+            clonedCard.style.borderRadius = '15px';
             clonedCard.style.background = 'white';
             clonedCard.style.boxSizing = 'border-box';
             
@@ -455,22 +923,31 @@
             // Klonun boyutlarını ayarla
             const titleElement = clonedCard.querySelector('.title');
             if (titleElement) {
-                titleElement.style.fontSize = '2.5em';
+                titleElement.style.fontSize = '3.2em';
+                titleElement.style.letterSpacing = '3px';
             }
             
             const detailLabels = clonedCard.querySelectorAll('.detail-label');
             const detailValues = clonedCard.querySelectorAll('.detail-value');
             
             detailLabels.forEach(label => {
-                label.style.fontSize = '16px';
-                label.style.padding = '12px 16px';
-                label.style.minWidth = '100px';
+                label.style.fontSize = currentFontSize + 'px';
+                label.style.padding = '20px 30px';
+                label.style.minWidth = '160px';
+                label.style.fontWeight = 'bold';
             });
             
             detailValues.forEach(value => {
-                value.style.fontSize = '16px';
-                value.style.padding = '12px 16px';
+                value.style.fontSize = currentFontSize + 'px';
+                value.style.padding = '20px 30px';
+                value.style.fontWeight = 'bold';
             });
+            
+            // Gap'i artır
+            const propertyDetails = clonedCard.querySelector('.property-details');
+            if (propertyDetails) {
+                propertyDetails.style.gap = '12px';
+            }
             
             // Klon tamamen render edilmesi için kısa bir gecikme
             setTimeout(() => {
@@ -486,56 +963,67 @@
                     scrollY: 0,
                     logging: false
                 }).then(function(canvas) {
-                // Klonu DOM'dan kaldır
-                document.body.removeChild(clonedCard);
-                
-                // A4 landscape canvas oluştur (sabit boyutlar)
-                const landscapeCanvas = document.createElement('canvas');
-                const ctx = landscapeCanvas.getContext('2d');
-                
-                // A4 landscape boyutları (297x210 mm = 1754x1240 px at 150dpi)
-                const A4_WIDTH = 1754;
-                const A4_HEIGHT = 1240;
-                
-                landscapeCanvas.width = A4_WIDTH;
-                landscapeCanvas.height = A4_HEIGHT;
-                
-                // Beyaz arka plan
-                ctx.fillStyle = '#ffffff';
-                ctx.fillRect(0, 0, A4_WIDTH, A4_HEIGHT);
-                
-                // İçeriği A4'e sığdır ve ortala
-                const margin = 100;
-                const maxWidth = A4_WIDTH - (margin * 2);
-                const maxHeight = A4_HEIGHT - (margin * 2);
-                
-                // Scale hesapla
-                const scaleX = maxWidth / canvas.width;
-                const scaleY = maxHeight / canvas.height;
-                const scale = Math.min(scaleX, scaleY);
-                
-                const scaledWidth = canvas.width * scale;
-                const scaledHeight = canvas.height * scale;
-                
-                // Merkeze yerleştir
-                const x = (A4_WIDTH - scaledWidth) / 2;
-                const y = (A4_HEIGHT - scaledHeight) / 2;
-                
-                // İçeriği çiz
-                ctx.drawImage(canvas, x, y, scaledWidth, scaledHeight);
-                
-                // İndir
-                const link = document.createElement('a');
-                const fileName = currentType === 'kiralik' ? 'kiralik-ilani.png' : 'satilik-ilani.png';
-                
-                link.download = fileName;
-                link.href = landscapeCanvas.toDataURL('image/png', 0.95);
-                
-                // Link'i DOM'a ekle, tıkla ve kaldır
-                document.body.appendChild(link);
-                link.click();
-                document.body.removeChild(link);
-                
+                    document.body.removeChild(clonedCard);
+                    
+                    // A4 landscape canvas oluştur
+                    const landscapeCanvas = document.createElement('canvas');
+                    const ctx = landscapeCanvas.getContext('2d');
+                    
+                    // A4 landscape boyutları
+                    const A4_WIDTH = 1754;
+                    const A4_HEIGHT = 1240;
+                    
+                    landscapeCanvas.width = A4_WIDTH;
+                    landscapeCanvas.height = A4_HEIGHT;
+                    
+                    // Beyaz arka plan
+                    ctx.fillStyle = '#ffffff';
+                    ctx.fillRect(0, 0, A4_WIDTH, A4_HEIGHT);
+                    
+                    // Firma adı ekle (üst kısımda)
+                    ctx.font = 'bold 80px Arial, sans-serif';
+                    ctx.fillStyle = currentType === 'kiralik' ? '#3498db' : '#e74c3c';
+                    ctx.textAlign = 'center';
+                    ctx.textBaseline = 'top';
+                    ctx.fillText(firma.toUpperCase(), A4_WIDTH / 2, 40);
+                    
+                    // İçeriği A4'e sığdır
+                    const topMargin = 140;
+                    const margin = 60;
+                    const maxWidth = A4_WIDTH - (margin * 2);
+                    const maxHeight = A4_HEIGHT - topMargin - margin;
+                    
+                    // Scale hesapla
+                    const scaleX = maxWidth / canvas.width;
+                    const scaleY = maxHeight / canvas.height;
+                    const scale = Math.min(scaleX, scaleY);
+                    
+                    const scaledWidth = canvas.width * scale;
+                    const scaledHeight = canvas.height * scale;
+                    
+                    // Merkeze yerleştir
+                    const x = (A4_WIDTH - scaledWidth) / 2;
+                    const y = topMargin + (maxHeight - scaledHeight) / 2;
+                    
+                    // İçeriği çiz
+                    ctx.drawImage(canvas, x, y, scaledWidth, scaledHeight);
+                    
+                    // İndir
+                    const link = document.createElement('a');
+                    const cinsValue = document.getElementById('cins').value.trim();
+                    const konumValue = document.getElementById('konum').value.trim();
+                    const cinsClean = cinsValue ? cinsValue.toLowerCase().replace(/[\/\\:*?"<>|]/g, '').replace(/\s+/g, '_') : 'ilan';
+                    const konumClean = konumValue ? konumValue.toLowerCase().replace(/[\/\\:*?"<>|]/g, '').replace(/\s+/g, '_') : 'konum';
+                    const fileName = cinsClean + '_' + konumClean + '.png';
+                    
+                    link.download = fileName;
+                    link.href = landscapeCanvas.toDataURL('image/png', 0.95);
+                    
+                    // Link'i DOM'a ekle, tıkla ve kaldır
+                    document.body.appendChild(link);
+                    link.click();
+                    document.body.removeChild(link);
+                    
                 }).catch(function(error) {
                     // Hata durumunda klonu temizle
                     if (document.body.contains(clonedCard)) {
@@ -544,13 +1032,158 @@
                     console.error('Resim indirme hatası:', error);
                     alert('Resim indirme sırasında bir hata oluştu. Lütfen tekrar deneyin.');
                 });
-            }, 100); // 100ms gecikme
+            }, 100);
+        }
+
+        function downloadAsPDF() {
+            updatePreview();
+            
+            const previewCard = document.getElementById('preview-card');
+            const firma = document.getElementById('firma').value || 'ENSARİOĞLU GAYRİMENKUL';
+            const cinsValue = document.getElementById('cins').value.trim();
+            const konumValue = document.getElementById('konum').value.trim();
+            const cinsClean = cinsValue ? cinsValue.toLowerCase().replace(/[\/\\:*?"<>|]/g, '').replace(/\s+/g, '_') : 'ilan';
+            const konumClean = konumValue ? konumValue.toLowerCase().replace(/[\/\\:*?"<>|]/g, '').replace(/\s+/g, '_') : 'konum';
+            
+            // Klonlama
+            const clonedCard = previewCard.cloneNode(true);
+            clonedCard.style.position = 'absolute';
+            clonedCard.style.left = '-9999px';
+            clonedCard.style.top = '0';
+            clonedCard.style.width = '800px';
+            clonedCard.style.maxWidth = '800px';
+            clonedCard.style.padding = '30px';
+            clonedCard.style.fontSize = '22px';
+            clonedCard.style.border = currentType === 'kiralik' ? '6px solid #3498db' : '6px solid #e74c3c';
+            clonedCard.style.borderRadius = '15px';
+            clonedCard.style.background = 'white';
+            clonedCard.style.boxSizing = 'border-box';
+            
+            document.body.appendChild(clonedCard);
+            
+            const titleElement = clonedCard.querySelector('.title');
+            if (titleElement) {
+                titleElement.style.fontSize = '3.2em';
+                titleElement.style.letterSpacing = '3px';
+            }
+            
+            const detailLabels = clonedCard.querySelectorAll('.detail-label');
+            const detailValues = clonedCard.querySelectorAll('.detail-value');
+            
+            detailLabels.forEach(label => {
+                label.style.fontSize = currentFontSize + 'px';
+                label.style.padding = '20px 30px';
+                label.style.minWidth = '160px';
+                label.style.fontWeight = 'bold';
+            });
+            
+            detailValues.forEach(value => {
+                value.style.fontSize = currentFontSize + 'px';
+                value.style.padding = '20px 30px';
+                value.style.fontWeight = 'bold';
+            });
+            
+            // Gap'i artır
+            const propertyDetails = clonedCard.querySelector('.property-details');
+            if (propertyDetails) {
+                propertyDetails.style.gap = '12px';
+            }
+            
+            setTimeout(() => {
+                html2canvas(clonedCard, {
+                    backgroundColor: '#ffffff',
+                    scale: 2,
+                    useCORS: true,
+                    allowTaint: true,
+                    width: clonedCard.offsetWidth,
+                    height: clonedCard.offsetHeight,
+                    scrollX: 0,
+                    scrollY: 0,
+                    logging: false
+                }).then(function(canvas) {
+                    document.body.removeChild(clonedCard);
+                    
+                    // A4 landscape canvas oluştur (firma adı ile birlikte)
+                    const finalCanvas = document.createElement('canvas');
+                    const finalCtx = finalCanvas.getContext('2d');
+                    
+                    // A4 landscape boyutları
+                    const A4_WIDTH = 1754;
+                    const A4_HEIGHT = 1240;
+                    
+                    finalCanvas.width = A4_WIDTH;
+                    finalCanvas.height = A4_HEIGHT;
+                    
+                    // Beyaz arka plan
+                    finalCtx.fillStyle = '#ffffff';
+                    finalCtx.fillRect(0, 0, A4_WIDTH, A4_HEIGHT);
+                    
+                    // Firma adını ekle
+                    finalCtx.font = 'bold 80px Arial, sans-serif';
+                    finalCtx.fillStyle = currentType === 'kiralik' ? '#3498db' : '#e74c3c';
+                    finalCtx.textAlign = 'center';
+                    finalCtx.textBaseline = 'top';
+                    finalCtx.fillText(firma.toUpperCase(), A4_WIDTH / 2, 40);
+                    
+                    // İlan resmini ekle
+                    const topMargin = 140;
+                    const margin = 60;
+                    const maxWidth = A4_WIDTH - (margin * 2);
+                    const maxHeight = A4_HEIGHT - topMargin - margin;
+                    
+                    const scaleX = maxWidth / canvas.width;
+                    const scaleY = maxHeight / canvas.height;
+                    const scale = Math.min(scaleX, scaleY);
+                    
+                    const scaledWidth = canvas.width * scale;
+                    const scaledHeight = canvas.height * scale;
+                    
+                    const x = (A4_WIDTH - scaledWidth) / 2;
+                    const y = topMargin + (maxHeight - scaledHeight) / 2;
+                    
+                    finalCtx.drawImage(canvas, x, y, scaledWidth, scaledHeight);
+                    
+                    // Resmi PNG'e çevir
+                    const imgData = finalCanvas.toDataURL('image/png', 1.0);
+                    
+                    // jsPDF ile direkt PDF'e dönüştür
+                    const { jsPDF } = window.jspdf;
+                    const pdf = new jsPDF({
+                        orientation: 'landscape',
+                        unit: 'mm',
+                        format: 'a4'
+                    });
+                    
+                    const pageWidth = pdf.internal.pageSize.getWidth();
+                    const pageHeight = pdf.internal.pageSize.getHeight();
+                    
+                    // Resmi PDF'e ekle (tam sayfa kaplasın)
+                    pdf.addImage(imgData, 'PNG', 0, 0, pageWidth, pageHeight);
+                    
+                    // PDF'i indir
+                    const fileName = cinsClean + '_' + konumClean + '.pdf';
+                    pdf.save(fileName);
+                    
+                }).catch(function(error) {
+                    if (document.body.contains(clonedCard)) {
+                        document.body.removeChild(clonedCard);
+                    }
+                    console.error('Hata:', error);
+                    alert('PDF oluşturma hatası: ' + error.message);
+                });
+            }, 100);
         }        // Auto-update preview when typing
         document.addEventListener('DOMContentLoaded', function() {
-            const inputs = ['cins', 'konum', 'ozellik', 'fiyat'];
+            const inputs = ['firma', 'cins', 'konum', 'ozellik', 'fiyat'];
             inputs.forEach(id => {
                 document.getElementById(id).addEventListener('input', updatePreview);
             });
+            
+            // İlk yükleme için font boyutunu uygula
+            updateFontSize(currentFontSize);
+            
+            // Sayfa yüklendiğinde yardım modal'ını aç
+            openHelp();
         });
     </script>
 </body>
