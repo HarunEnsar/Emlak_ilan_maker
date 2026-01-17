@@ -549,7 +549,12 @@
             align-items: center;
             margin-bottom: 20px;
             padding-bottom: 15px;
+            padding-top: 0;
             border-bottom: 3px solid #e74c3c;
+            position: sticky;
+            top: 0;
+            background: white;
+            z-index: 10000;
         }
 
         .modal-header h2 {
@@ -561,14 +566,24 @@
         .modal-close {
             background: none;
             border: none;
-            font-size: 32px;
+            font-size: 48px;
             cursor: pointer;
             color: #e74c3c;
             font-weight: bold;
+            padding: 0;
+            width: 50px;
+            height: 50px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            border-radius: 50%;
+            transition: all 0.3s;
         }
 
         .modal-close:hover {
-            color: #c0392b;
+            background: #e74c3c;
+            color: white;
+            transform: scale(1.15);
         }
 
         .modal-body {
@@ -725,9 +740,9 @@
                 <label style="background: #2c3e50;">YAZI BOYUTU AYARI</label>
                 <div style="display: flex; gap: 20px; align-items: center; padding: 15px; border: 3px solid #2c3e50; border-top: none; border-radius: 0 0 5px 5px; background: white;">
                     <span style="font-weight: bold; min-width: 100px;">Küçük</span>
-                    <input type="range" id="fontSize" min="18" max="36" value="28" step="2" style="flex: 1;" oninput="updateFontSize(this.value)">
+                    <input type="range" id="fontSize" min="18" max="36" value="34" step="2" style="flex: 1;" oninput="updateFontSize(this.value)">
                     <span style="font-weight: bold; min-width: 100px; text-align: right;">Büyük</span>
-                    <span id="fontSizeValue" style="font-weight: bold; min-width: 60px; text-align: center; background: #2c3e50; color: white; padding: 5px 10px; border-radius: 5px;">28px</span>
+                    <span id="fontSizeValue" style="font-weight: bold; min-width: 60px; text-align: center; background: #2c3e50; color: white; padding: 5px 10px; border-radius: 5px;">34px</span>
                 </div>
             </div>
 
@@ -778,7 +793,7 @@
 
     <script>
         let currentType = 'satilik';
-        let currentFontSize = 28;
+        let currentFontSize = 34;
 
         function openHelp() {
             document.getElementById('helpModal').classList.add('show');
